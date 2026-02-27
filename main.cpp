@@ -11,6 +11,14 @@ void printLocationInfo(const Landmark& landmark) {
     std::cout << "Ориентир: " << landmark << std::endl;
 }
 
+// Функция move: работает с базовым классом (перемещение).
+// Принимает ссылку на базовый класс, поэтому не знает о классах-потомках.
+void move(GeoLocation& loc, double newLat, double newLon) {
+    loc.setLatitude(newLat);
+    loc.setLongitude(newLon);
+    std::cout << "Результат перемещения: " << loc << std::endl;
+}
+
 int main() {
     // 1. Создание объектов через конструктор по умолчанию
     GeoLocation moscow;
@@ -73,6 +81,17 @@ int main() {
     std::cout << "\n--- Функция printRoute ---" << std::endl;
     printRoute(moscow, stPetersburg);
     printRoute(redSquare, hermitage);
+
+    // 12. Демонстрация функции move (работает с базовым классом)
+    std::cout << "\n--- Функция move ---" << std::endl;
+    std::cout << "До перемещения (базовый класс): " << moscow << std::endl;
+    move(moscow, 56.0, 38.0);
+    
+    // Передача объекта-наследника в функцию, принимающую ссылку на базовый класс
+    // Объекту-наследнику изменят координаты через методы базового класса
+    std::cout << "\nДо перемещения (наследник Landmark): " << redSquare << std::endl;
+    move(redSquare, 55.7500, 37.6100);
+    std::cout << "После вызова move (свойства наследника сохранены): " << redSquare << std::endl;
 
     return 0;
 }
