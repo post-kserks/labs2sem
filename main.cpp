@@ -1,5 +1,15 @@
 #include "GeoLocation.h"
+#include "Landmark.h"
 #include <iostream>
+
+// Полиморфная функция (перегруженная для базового и производного классов)
+void printLocationInfo(const GeoLocation& location) {
+    std::cout << "Точка: " << location << std::endl;
+}
+
+void printLocationInfo(const Landmark& landmark) {
+    std::cout << "Ориентир: " << landmark << std::endl;
+}
 
 int main() {
     // 1. Создание объектов через конструктор по умолчанию
@@ -45,6 +55,24 @@ int main() {
     if (moscow != stPetersburg) {
         std::cout << "Оператор !=: Москва и Санкт-Петербург — разные точки." << std::endl;
     }
+
+    // 9. Работа с расширенным классом Landmark
+    Landmark redSquare("Красная площадь", 55.7539, 37.6208);
+    Landmark hermitage("Эрмитаж", 59.9398, 30.3146);
+
+    std::cout << "\n--- Ориентиры ---" << std::endl;
+    std::cout << redSquare << std::endl;
+    std::cout << hermitage << std::endl;
+
+    // 10. Демонстрация полиморфной функции
+    std::cout << "\n--- Полиморфная функция printLocationInfo ---" << std::endl;
+    printLocationInfo(moscow);      // базовый класс
+    printLocationInfo(redSquare);   // расширенный класс
+
+    // 11. Демонстрация функции маршрута
+    std::cout << "\n--- Функция printRoute ---" << std::endl;
+    printRoute(moscow, stPetersburg);
+    printRoute(redSquare, hermitage);
 
     return 0;
 }

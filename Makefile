@@ -9,7 +9,7 @@ ARFLAGS = rcs
 # Имена файлов
 LIB_NAME = libgeolocation.a
 EXE_NAME = demo
-SRCS_LIB = GeoLocation.cpp
+SRCS_LIB = GeoLocation.cpp Landmark.cpp
 OBJS_LIB = $(SRCS_LIB:.cpp=.o)
 SRCS_EXE = main.cpp
 
