@@ -1,0 +1,79 @@
+
+Методичесие указания к семинару №6
+Требуемые условия завершения
+Реализовать очередь отложенных вызовов функций и методов классов из
+предметной области из предыдущих семинаров и лабораторных работ.
+
+Для этого создать объект, имеющий следующие два основных метода:
+- enqueue :: Метод для добавления отложенного вызова функции.
+  Принимает указатель на функцию или метод, который необходимо
+  вызвать, а также аргументы, которые нужно в этом вызове
+  использовать.
+- run :: Выполняет один из отложенных вызовов
+
+Поскольку функция может быть произвольной, количество и типы
+аргументов заранее неизвестны. Поэтому необходимо использовать
+вариадические шаблоны. Рекомендуется опираться на следующую
+реализацию:
+
+- базовый класс отложенного вызова ::
+  #+begin_src c++
+    class IPending {
+    public:
+      virtual void run() = 0;
+    };
+  #+end_src
+- специализированный класс отложенного вызова ::
+  #+begin_src c++
+    template<typename Callable, typename... Args>
+    class Pending : public IPending {
+    private:
+      Callable _callable;
+      std::tuple<Args...> _args;
+
+    public:
+      Pending(Callable callable, Args... args)
+        : _callable(callable)
+        , _args(std::make_tuple(args...)) {}
+
+      virtual void run() override {
+        std::apply(_callable, _args);
+      }
+    };
+  #+end_src
+- класс, реализующий очередь отложенных вызовов ::
+  #+begin_src c++
+    class PendingQueue : std::queue<std::unique_ptr<IPending>> {
+    public:
+      ~PendingQueue() {
+        printf("%ld pending items dropped\n", size());
+      }
+
+      template<typename Callable, typename... ArgTypes>
+      void enqueue(Callable callable, ArgTypes... args) {
+        using PendingType = Pending<Callable, ArgTypes...>;
+        emplace(std::make_unique<PendingType>(callable, args...));
+      }
+
+      void run_one() {
+        if (empty())
+          return;
+        front()->run();
+        pop();
+      }
+
+      void run_all() {
+        while (!empty())
+          run_one();
+      }
+    };
+  #+end_src
+- примеры использования ::
+  - отложенный вызов функции ::
+    #+begin_src c++
+      queue.enqueue(printf, "Hello, %s\n", "world");
+    #+end_src
+  - отложенный вызов метода ::
+    #+begin_src c++
+      queue.enqueue(&Library.push_back, &library, Book("1984", "Orwell"));
+    #+end_src
