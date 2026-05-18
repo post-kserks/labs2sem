@@ -1,0 +1,422 @@
+Методические указания к семинару 5
+
+Цель: Создание  коллекции. Шаблоны классов и итераторы
+
+Часть 1. Теоретический материал
+
+Коллекция (контейнер) — это объект, который хранит группу других объектов и предоставляет методы для работы с ними: добавление, удаление, поиск, перебор.
+
+Если в задаче используется большое количество объектов, то необходимо их создать, что часто очень трудоёмко, а иногда невозможно. Например, библиотека хранит 1000000 книг.
+
+Для решения проблемы создания большого количества объектов можно использовать коллекцию. Создаётся всего один объект, который имеет свой функционал.
+
+При обычном подходе
+
+Book    book1, book2, book3, ... book1000;
+
+С использованием коллекции
+
+MyContainer<Book> library;   // одна коллекция на все книги
+
+library.push_back(Book("1984", "Orwell"));
+
+library.push_back(Book("Crime and punishment", " Dostoevsky"));
+
+Итератор —  объект, который указывает на элемент внутри коллекции и позволяет перемещаться по ней. Он работает как «умный указатель». Итератор скрывает внутреннее устройство коллекции (массив, список, дерево). Позволяет перебирать элементы единообразно. Даёт возможность использовать коллекцию  в цикле for с диапазоном (for (auto& item : collection)). Без итератора приходится привязываться  к используемой структуре, например к массиву. С итератором код перебора работает для любой коллекции.
+
+ Чтобы перебрать все элементы коллекции, нужно два итератора:
+
+- один указывает на первый элемент (begin);
+
+- другой указывает на позицию после последнего (end).
+
+Стандартный способ обхода любой коллекции:
+
+цикл сдвигает первый итератор на следующий (++it), пока он не достигнет второго итератора (it != end). 
+
+for (auto it = коллекция.begin(); it != коллекция.end(); ++it) {
+
+    // it указывает на текущий элемент
+
+    // *it — сам элемент
+
+}
+
+Пример цикла для решения задачи (Библиотека, MyContainer<Book> - коллекция) вывода на экран всех книг, у которых год издания больше 2000.Задача решается с помощью итераторов:
+
+ 
+
+void printNewBooks(const MyContainer<Book>& library) {
+
+    for (auto it = library.begin(); it != library.end(); ++it) {
+
+        if (it->getYear() > 2000) {
+
+            it->print();
+
+        }
+
+    }
+
+}
+
+Функционал итератора:
+
+Получать элемент, на который указывает
+
+2. Переходить к следующему элементу
+
+3. Сравниваться с другим итератором
+
+Использование итератора для работы с функциями стандартных библиотек С++:
+
+В стандартной библиотеке C++ алгоритмы (std::find, std::sort, std::copy) работают не с контейнерами, а с итераторами. Это позволяет использовать один и тот же алгоритм для любых контейнеров: вектора, списка, массива, собственной коллекции.
+
+Пример:
+
+MyContainer<Book> library;
+
+auto it = std::find(library.begin(), library.end(), some_book);
+
+std::sort(library.begin(), library.end(), comparator);
+
+Функцияи библиотек C++ необходимо передать информацию об итераторе:
+
+1.      Категория  std::input_iterator_tag
+
+OutputIterator - Писать, двигаться вперёд -  std::output_iterator_tag
+
+ForwardIterator  - Читать/писать, много проходов - std::forward_iterator_tag
+
+BidirectionalIterator Вперёд и назад std::bidirectional_iterator_tag
+
+RandomAccessIterator Прыгать (it + 5, it[3]) std::random_access_iterator_tag
+
+2.      value_type: Тип элемента, на который указывает
+
+3.      difference_type: Тип для разницы между итераторами std::ptrdiff_t
+
+4.      pointer: Тип указателя на элемент 
+
+5.      reference: Тип ссылки на элемент
+
+ 
+
+Для этого необходимо добавить в  класс Iterator  строки с using — они описывают характеристики итератора.
+
+В  стандартной библиотеке C++ используется механизм std::iterator_traits, с помощью передаются характеристики  итератора.
+
+Часть 2. Задание
+
+1. Для класса предметной области по варианту реализовать шаблонный класс-коллекцию MyContainer<T> — динамический массив, который может хранить объекты любого типа.
+
+2. Реализовать внутренний итератор для этой коллекции.
+
+3. Применить std::find и std::sort для поиска и сортировки элементов в собственной  коллекции, используя итераторы.
+
+4. Придумать и решить реальную задачу на предметной области, используя коллекцию и итераторы.
+
+ 
+
+Часть 3. Критерии оценки
+
+·       Класс предметной области  взят из прошлых семинаров
+
+·       Шаблонный класс MyContainer<T> реализован (конструктор, деструктор, push/pop, доступ по индексу)
+
+·       Итератор реализован и работает
+
+·       Прикладное задание решено с использованием итераторов
+
+·       Студент может объяснить код и ответить на вопросы защиты
+
+ 
+
+Пример кода:
+
+include <string>
+
+#include <iostream>
+
+#include <algorithm>
+
+#include <iterator>  // для std::input_iterator_tag
+
+ 
+
+class Book {
+
+    std::string title;
+
+    std::string author;
+
+    int year;
+
+    double price;
+
+public:
+
+    Book(const std::string& t = "", const std::string& a = "", int y = 0, double p = 0.0)
+
+        : title(t), author(a), year(y), price(p) {}
+
+   
+
+    std::string getTitle() const { return title; }
+
+    std::string getAuthor() const { return author; }
+
+    int getYear() const { return year; }
+
+    double getPrice() const { return price; }
+
+   
+
+    void print() const {
+
+        std::cout << title << " by " << author << " (" << year << ") - $" << price << std::endl;
+
+    }
+
+   
+
+    bool operator==(const Book& other) const {
+
+        return title == other.title && author == other.author;
+
+    }
+
+};
+
+ 
+
+template <typename T>
+
+class MyContainer {
+
+private:
+
+    T* data;
+
+    size_t size;
+
+    size_t capacity;
+
+   
+
+    void resize(size_t new_capacity) {
+
+        T* new_data = new T[new_capacity];
+
+        for (size_t i = 0; i < size; ++i)
+
+            new_data[i] = data[i];
+
+        delete[] data;
+
+        data = new_data;
+
+        capacity = new_capacity;
+
+    }
+
+   
+
+public:
+
+    MyContainer() : data(nullptr), size(0), capacity(0) {}
+
+    ~MyContainer() { delete[] data; }
+
+   
+
+    void push_back(const T& value) {
+
+        if (size >= capacity) {
+
+            size_t new_cap = (capacity == 0) ? 1 : capacity * 2;
+
+            resize(new_cap);
+
+        }
+
+        data[size++] = value;
+
+    }
+
+   
+
+    void pop_back() {
+
+        if (size > 0) --size;
+
+    }
+
+   
+
+    T& operator[](size_t index) {
+
+        return data[index];
+
+    }
+
+   
+
+    size_t getSize() const { return size; }
+
+   
+
+    //  ВНУТРЕННИЙ ИТЕРАТОР
+
+    class Iterator {
+
+    private:
+
+        T* ptr;
+
+       
+
+    public:
+
+        // Характеристики итератора. Типы, необходимые для работы с //std::iterator_traits
+
+        using iterator_category = std::input_iterator_tag;
+
+        using value_type = T;
+
+        using difference_type = std::ptrdiff_t;
+
+        using pointer = T*;
+
+        using reference = T&;
+
+       
+
+        Iterator(T* p = nullptr) : ptr(p) {}
+
+       
+
+        reference operator*() { return *ptr; }
+
+        pointer operator->() { return ptr; }
+
+       
+
+        const reference operator*() const { return *ptr; }
+
+        const pointer operator->() const { return ptr; }
+
+       
+
+        Iterator& operator++() {
+
+            ++ptr;
+
+            return *this;
+
+        }
+
+       
+
+        Iterator operator++(int) {
+
+            Iterator old = *this;
+
+            ++ptr;
+
+            return old;
+
+        }
+
+       
+
+        bool operator==(const Iterator& other) const {
+
+            return ptr == other.ptr;
+
+        }
+
+       
+
+        bool operator!=(const Iterator& other) const {
+
+            return ptr != other.ptr;
+
+        }
+
+    };
+
+   
+
+    Iterator begin() { return Iterator(data); }
+
+    Iterator end()   { return Iterator(data + size); }
+
+   
+
+    Iterator begin() const { return Iterator(data); }
+
+    Iterator end() const   { return Iterator(data + size); }
+
+};
+
+ 
+
+int main() {
+
+    MyContainer<Book> library;
+
+    library.push_back(Book("1984", "Orwell", 1949, 9.99));
+
+    library.push_back(Book("Brave New World", "Huxley", 1932, 8.99));
+
+    library.push_back(Book("Fahrenheit 451", "Bradbury", 1953, 10.99));
+
+   
+
+    Book searchBook("1984", "Orwell");
+
+   
+
+    auto it = std::find(library.begin(), library.end(), searchBook);
+
+   
+
+    if (it != library.end()) {
+
+        std::cout << "Книга найдена: ";
+
+        it->print();
+
+    } else {
+
+        std::cout << "Книга не найдена" << std::endl;
+
+    }
+
+   
+
+    Book missingBook("Nonexistent", "Nobody");
+
+    auto it2 = std::find(library.begin(), library.end(), missingBook);
+
+   
+
+    if (it2 != library.end()) {
+
+        std::cout << "Книга найдена!" << std::endl;
+
+    } else {
+
+        std::cout << "Книга не найдена (ожидаемо)" << std::endl;
+
+    }
+
+   
+
+    return 0;
+
+}
+
+ 
+
