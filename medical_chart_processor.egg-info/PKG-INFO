@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: medical-chart-processor
+Version: 0.1.0
+Summary: Pipeline for extracting two time series from medical research chart images
+Requires-Python: >=3.11
+Requires-Dist: opencv-python>=4.8.0
+Requires-Dist: numpy>=1.26
+Requires-Dist: pandas>=2.2
+Requires-Dist: pyyaml>=6.0

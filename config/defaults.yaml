@@ -1,0 +1,25 @@
+image:
+  dark_threshold: 145
+  max_tracking_jump_px: 70
+  smoothing_window: 11
+  min_line_length_ratio: 0.35
+
+time:
+  duration_minutes: 20.0
+  start_timestamp: null
+  sampling_step_seconds: 1.0
+
+axes:
+  upper:
+    name: fetal_heart_rate
+    unit: bpm
+    min_value: 50.0
+    max_value: 210.0
+  lower:
+    name: uterine_activity
+    unit: mmHg
+    min_value: 0.0
+    max_value: 100.0
+
+output:
+  include_debug_images: true

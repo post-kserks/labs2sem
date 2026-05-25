@@ -1,0 +1,3 @@
+[console_scripts]
+chart-processor = cmd.main:main
+chart-render-from-csv = cmd.render_from_csv:main

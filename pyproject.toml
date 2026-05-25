@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "medical-chart-processor"
+version = "0.1.0"
+description = "Pipeline for extracting two time series from medical research chart images"
+requires-python = ">=3.11"
+dependencies = [
+  "opencv-python>=4.8.0",
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "pyyaml>=6.0"
+]
+
+[project.scripts]
+chart-processor = "cmd.main:main"
+chart-render-from-csv = "cmd.render_from_csv:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cmd*", "internal*", "pkg*", "utils*"]
