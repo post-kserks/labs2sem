@@ -17,6 +17,12 @@ medical_chart_processor.egg-info/entry_points.txt
 medical_chart_processor.egg-info/requires.txt
 medical_chart_processor.egg-info/top_level.txt
 pkg/__init__.py
+pkg/ctg/__init__.py
+pkg/ctg/aligner.py
+pkg/ctg/analyzer.py
+pkg/ctg/digitizer.py
+pkg/ctg/extractor.py
+pkg/ctg/reconstructor.py
 pkg/imageproc/__init__.py
 pkg/imageproc/alignment.py
 pkg/imageproc/chart_splitter.py
@@ -24,6 +30,7 @@ pkg/imageproc/curve_extractor.py
 pkg/timeseries/__init__.py
 pkg/timeseries/exporter.py
 pkg/timeseries/series_builder.py
+tests/test_ctg_csv.py
 tests/test_series_builder.py
 utils/__init__.py
 utils/files.py

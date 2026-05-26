@@ -1,24 +1,27 @@
-# Medical Chart Processor
+# CTG Tape Processor
 
-Production-oriented pipeline for extracting two time series from medical chart images (e.g., CTG-like scans):
+Pipeline for processing photo-based CTG strips (кардиотокограмма):
 
-1. Align image by horizontal/vertical grid lines.
-2. Detect study duration and axis dimensionality from config (with report output).
-3. Extract first graph (upper panel).
-4. Extract second graph (lower panel).
-5. Build synchronized time series.
-6. Save `CSV` and reconstructed chart image.
+1. Align strip by grid lines and correct perspective.
+2. Detect separator band and split FHR/TOCO zones.
+3. Calibrate time/value scales from red grid.
+4. Extract dark signal lines while excluding red grid.
+5. Digitize two time series (FHR and TOCO).
+6. Save CTG CSV with metadata comments and reconstruct CTG image from CSV.
 
 ## Architecture
 
-- `cmd/` CLI entrypoint.
-- `internal/application/` orchestration use-case (`ChartProcessingPipeline`).
-- `internal/domain/` domain models/config contracts.
-- `internal/services/` infrastructure service adapters (config loader).
-- `pkg/imageproc/` computer vision primitives (alignment, panel split, curve extraction).
-- `pkg/timeseries/` calibration, resampling, CSV and plot export.
-- `utils/` cross-cutting helpers.
-- `tests/` unit tests.
+- `cmd/main.py` — CLI processing entrypoint.
+- `cmd/render_from_csv.py` — reconstruct image from CSV.
+- `internal/application/pipeline.py` — orchestration.
+- `internal/domain/models.py` — domain contracts (`CTGMetadata`, `ExtractedSeries`, config specs).
+- `internal/services/config_loader.py` — YAML config loader.
+- `pkg/ctg/aligner.py` — skew + perspective correction + crop.
+- `pkg/ctg/analyzer.py` — separator/grid analysis and metadata extraction.
+- `pkg/ctg/extractor.py` — HSV masks for grid/signal and FHR-TOCO split.
+- `pkg/ctg/digitizer.py` — column-wise digitization, interpolation, median smoothing.
+- `pkg/ctg/reconstructor.py` — CTG-style PNG reconstruction from CSV.
+- `pkg/timeseries/exporter.py` — CSV/report serialization.
 
 ## Setup
 
@@ -29,41 +32,43 @@ python3 -m venv .venv
 
 ## Run
 
-List input images:
+List images:
 
 ```bash
 .venv/bin/python -m cmd.main --input-dir . --list
 ```
 
-Process first image from list:
+Process by explicit file:
 
 ```bash
-.venv/bin/python -m cmd.main --input-dir . --index 1 --output-dir output
+.venv/bin/python -m cmd.main --image 13-2-3.jpg --output-dir output
 ```
 
-Process explicit image with overridden duration:
-
-```bash
-.venv/bin/python -m cmd.main --image 13-2-3.jpg --duration-minutes 20 --sampling-step 1 --output-dir output
-```
-
-Render image from an already prepared CSV:
+Reconstruct from CSV:
 
 ```bash
 .venv/bin/python -m cmd.render_from_csv --csv output/13-2-3_timeseries.csv --output output/13-2-3_from_csv.png
 ```
 
-## Output
+## CSV format
 
-- `*_timeseries.csv` extracted numerical time series.
-- `*_reconstructed_plot.png` reconstructed chart from CSV.
-- `*_report.json` processing report with axis dimensionality and study duration.
-- `*_aligned.jpg`, `*_upper_panel.jpg`, `*_lower_panel.jpg`, masks for debugging.
+Generated CSV includes metadata comments:
 
-## Configuration
+```csv
+# source: 13-2-3.jpg
+# type: CTG
+# time_start: 09:00
+# duration_min: 20.000
+# fhr_scale: 60-200 bpm
+# toco_scale: 0-100
+# paper_speed: 1.0 cm/min
+# px_per_minute: 47.300
+time_min,fhr_bpm,toco_units
+0.000,138.2,4.1
+...
+```
 
-Edit `config/defaults.yaml`:
+## Notes
 
-- `time.duration_minutes`: expected duration of study on full image width.
-- `axes.upper` and `axes.lower`: dimensionality (`name`, `unit`, `min_value`, `max_value`).
-- `image.dark_threshold`, `max_tracking_jump_px`, `smoothing_window`: extraction robustness.
+- `paper_speed` is estimated heuristically (1 vs 3 cm/min) from calibrated horizontal scale.
+- `time_start` comes from config (`config/defaults.yaml`) unless OCR module is added.

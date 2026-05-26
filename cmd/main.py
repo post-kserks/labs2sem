@@ -11,7 +11,7 @@ from utils.files import list_images
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Medical chart processor: extract 2 time series and save CSV + plot.",
+        description="CTG processor: align photo, digitize FHR/TOCO, save CSV and reconstruction.",
     )
     parser.add_argument("--input-dir", type=Path, default=Path("."), help="Directory with source images.")
     parser.add_argument("--image", type=Path, default=None, help="Direct path to source image.")
@@ -87,7 +87,7 @@ def main() -> None:
 
     print(f"Selected image: {selected_image}")
     print(f"CSV: {artifacts.csv_path}")
-    print(f"Plot: {artifacts.plot_path}")
+    print(f"Plot: {artifacts.reconstructed_plot_path}")
     print(f"Report: {artifacts.report_path}")
 
 

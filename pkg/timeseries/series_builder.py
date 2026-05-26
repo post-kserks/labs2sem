@@ -14,13 +14,13 @@ def _pixels_to_values(y_pixels: np.ndarray, panel_height: int, axis: AxisSpec) -
     return values.astype(np.float32)
 
 
-def _build_uniform_time_axis(duration_minutes: float, step_seconds: float) -> np.ndarray:
+def _build_uniform_time_axis_minutes(duration_minutes: float, step_seconds: float) -> np.ndarray:
     duration_seconds = max(1.0, duration_minutes * 60.0)
     if step_seconds <= 0:
         raise ValueError("sampling_step_seconds must be positive")
 
     points = int(np.floor(duration_seconds / step_seconds)) + 1
-    return np.linspace(0.0, duration_seconds, points, dtype=np.float32)
+    return np.linspace(0.0, duration_seconds / 60.0, points, dtype=np.float32)
 
 
 def build_extracted_series(
@@ -42,9 +42,8 @@ def build_extracted_series(
     upper_values = _pixels_to_values(upper_trimmed, upper_panel_height, upper_axis)
     lower_values = _pixels_to_values(lower_trimmed, lower_panel_height, lower_axis)
 
-    total_seconds = max(1.0, time_spec.duration_minutes * 60.0)
-    original_time = np.linspace(0.0, total_seconds, width, dtype=np.float32)
-    target_time = _build_uniform_time_axis(
+    original_time = np.linspace(0.0, max(1e-6, time_spec.duration_minutes), width, dtype=np.float32)
+    target_time = _build_uniform_time_axis_minutes(
         duration_minutes=time_spec.duration_minutes,
         step_seconds=time_spec.sampling_step_seconds,
     )
@@ -53,7 +52,7 @@ def build_extracted_series(
     lower_resampled = np.interp(target_time, original_time, lower_values).astype(np.float32)
 
     return ExtractedSeries(
-        time_seconds=target_time,
-        upper_values=upper_resampled,
-        lower_values=lower_resampled,
+        time_min=target_time,
+        fhr_bpm=upper_resampled,
+        toco_units=lower_resampled,
     )

@@ -1,25 +1,50 @@
 image:
-  dark_threshold: 145
-  max_tracking_jump_px: 70
-  smoothing_window: 11
-  min_line_length_ratio: 0.35
+  canny_low: 60
+  canny_high: 180
+  min_line_length_ratio: 0.40
+  perspective_min_area_ratio: 0.50
+  clahe_clip_limit: 2.0
+  clahe_tile_size: 8
+
+  # HSV red grid mask
+  red_hue_low_1: 0
+  red_hue_high_1: 15
+  red_hue_low_2: 165
+  red_hue_high_2: 180
+  red_s_min: 80
+  red_v_min: 80
+
+  # HSV dark signal mask
+  dark_v_max: 120
+
+  max_tracking_jump_px: 75
+  interpolate_limit: 10
+  median_filter_window: 5
 
 time:
   duration_minutes: 20.0
-  start_timestamp: null
+  start_timestamp: "09:00"
   sampling_step_seconds: 1.0
 
 axes:
   upper:
-    name: fetal_heart_rate
+    name: fhr
     unit: bpm
-    min_value: 50.0
-    max_value: 210.0
+    min_value: 60.0
+    max_value: 200.0
+    major_step: 20.0
   lower:
-    name: uterine_activity
-    unit: mmHg
+    name: toco
+    unit: units
     min_value: 0.0
     max_value: 100.0
+    major_step: 20.0
 
 output:
   include_debug_images: true
+
+quality:
+  min_coverage: 0.20
+  max_mean_distance: 3.0
+  max_jump_ratio: 0.12
+  min_score: 0.45
